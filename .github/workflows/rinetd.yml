@@ -13,6 +13,9 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      VERSION_SUFFIX: ${{ github.event.inputs.version != 'main' && format('-{0}', github.event.inputs.version) || '' }}
+      FILE_NAME: "rinetd${{ env.VERSION_SUFFIX }}"
     steps:
       - name: Checkout rinetd
         uses: actions/checkout@v4
@@ -35,11 +38,9 @@ jobs:
       # 步骤4：打包二进制
       - name: Prepare release asset
         run: |
-          cd rinetd-src
-          mkdir -p release
-          cp rinetd release/
-          tar -czvf rinetd${{ github.event.inputs.version != 'main' && format('-{0}', github.event.inputs.version) || '' }}.tar.gz -C release .
-          echo "ASSET_PATH=rinetd${{ github.event.inputs.version != 'main' && format('-{0}', github.event.inputs.version) || '' }}.tar.gz" >> $GITHUB_ENV
+          cp rinetd-src/rinetd ./${{ env.FILE_NAME }}
+          tar -czvf ${{ env.FILE_NAME }}.tar.gz ${{ env.FILE_NAME }}
+          echo "ASSET_PATH=${{ env.FILE_NAME }}.tar.gz" >> $GITHUB_ENV
       # 步骤5：发布到 GitHub Release
       - name: Create Release
         uses: softprops/action-gh-release@v1
