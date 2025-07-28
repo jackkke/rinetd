@@ -14,8 +14,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      VERSION_SUFFIX: ${{ github.event.inputs.version != 'main' && format('-{0}', github.event.inputs.version) || '' }}
-      FILE_NAME: "rinetd${{ env.VERSION_SUFFIX }}"
+      FILE_NAME: "rinetd${{ github.event.inputs.version != 'main' && format('-{0}', github.event.inputs.version) || '' }}"
     steps:
       - name: Checkout rinetd
         uses: actions/checkout@v4
