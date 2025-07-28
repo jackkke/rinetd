@@ -1,0 +1,38 @@
+name: Build rinetd (manual version input)
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "输入 rinetd 版本号（例如 'main', 'v0.73', 'v0.72'）"
+        required: true
+        default: "main"  # 默认值（可选）
+        type: string     # 关键修改：允许自由输入文本
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout rinetd
+        uses: actions/checkout@v4
+        with:
+          repository: samhocevar/rinetd  # 目标仓库
+          ref: ${{ github.event.inputs.version }}  # 版本号（main/v0.73等）
+          path: rinetd-src  # 指定存放目录
+      # 步骤2：安装依赖
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc make automake
+      # 步骤3：编译
+      - name: Build
+        run: |
+          cd rinetd-src
+          ./bootstrap && ./configure && make && sudo make install
+          # 验证安装是否成功
+          which rinetd || { echo "编译失败！"; exit 1; }
+      # 步骤4：上传二进制（可选）
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: rinetd-${{ github.event.inputs.version }}
+          path: rinetd-src/rinetd
