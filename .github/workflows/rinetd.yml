@@ -32,7 +32,7 @@ jobs:
           which rinetd || { echo "编译失败！"; exit 1; }
       # 步骤4：上传二进制（可选）
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: rinetd-${{ github.event.inputs.version }}
+          name: rinetd${{ github.event.inputs.version != 'main' && format('-{0}', github.event.inputs.version) || '' }}
           path: rinetd-src/rinetd
